@@ -1,5 +1,4 @@
-import React from "react";
-
+import React, { useState } from "react";
 import styled from "styled-components";
 
 import ImgUpload from "../ui/ImgUpload";
@@ -13,9 +12,16 @@ const Container = styled.div`
 
 
 const InitialPage = () => {
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    const handleFileSelect = (file) => {
+        console.log(file);
+        setSelectedFile(file);
+    };
+
     return (
         <Container>
-            <ImgUpload />
+            <ImgUpload onFileSelect={handleFileSelect}/>
         </Container>
     );
 }
