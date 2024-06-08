@@ -81,6 +81,15 @@ const Text = styled.div`
   color: #252a2f;
 `;
 
+const NumToText = (difficulty) => {
+  switch (difficulty) {
+    case 0: return '상';
+    case 1: return '중';
+    case 2: return '하';
+    default: return '-';
+  }
+};
+
 const RecommendPage = () => {
   const location = useLocation();
   const { problem } = location.state || {};
@@ -110,11 +119,12 @@ const RecommendPage = () => {
       <Circle />
       {similarProblems.length > 0 ? (
         <ResultContainer>
-          <MainText>비슷한 문제들</MainText>
+          <MainText>아래 문제를 더 풀어보세요 🧮</MainText>
           {similarProblems.map((item, index) => (
             <div key={index}>
-              <Subtitle>난이도: {item.difficulty}</Subtitle>
-              <Text>문제: {item.question}</Text>
+              <Subtitle>난이도 {NumToText(item.difficulty)}</Subtitle>
+              <Text>{item.chapter}</Text>
+              <Text>{item.question}</Text>
             </div>
           ))}
         </ResultContainer>

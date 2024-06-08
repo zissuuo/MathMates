@@ -3,6 +3,7 @@ import styled, { keyframes } from "styled-components";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import ImgUpload from "../ui/ImgUpload";
+import Dropdown from "../ui/Dropdown"; // 경로 확인
 
 const Container = styled.div`
   height: 100vh;
@@ -47,6 +48,13 @@ const TitleContainer = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
+`;
+
+const DropdownContainer = styled.div`
+  width: 80%;
+  display: flex;
+  flex-direction: row;
+  gap: 5%;
 `;
 
 const UploadContainer = styled.div`
@@ -122,10 +130,15 @@ const Dot = styled.span`
 const InitialPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedOption, setSelectedOption] = useState('');
   const navigate = useNavigate();
 
   const handleFileSelect = (file) => {
     setSelectedFile(file);
+  };
+
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
   };
 
   const handleSubmit = async () => {
@@ -154,6 +167,9 @@ const InitialPage = () => {
     }
   };
 
+  const options1 = ['3학년 1학기'];
+  const options2 = ['1. 덧셈과 뺄셈', '3. 나눗셈', '4. 곱셈'];
+
   return (
     <Container>
       <TitleContainer>
@@ -161,6 +177,10 @@ const InitialPage = () => {
         <Title>MATHMATES</Title>
       </TitleContainer>
       <Circle />
+      <DropdownContainer>
+        <Dropdown options={options1} onSelect={handleOptionSelect} label="학년" />
+        <Dropdown options={options2} onSelect={handleOptionSelect} label="단원" />  
+      </DropdownContainer>
       <UploadContainer>
         <ImgUpload onFileSelect={handleFileSelect} />
       </UploadContainer>
