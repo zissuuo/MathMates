@@ -139,19 +139,19 @@ const InitialPage = () => {
 
     setIsLoading(true);
 
-    // try {
-    //   const response = await axios.post("http://localhost:8000/solve-problem", formData, {
-    //     headers: {
-    //       "Content-Type": "multipart/form-data",
-    //     },
-    //   });
-    //   navigate('/explain', { state: { result: response.data } });
-    // } catch (error) {
-    //   console.error("Error solving problem:", error);
-    //   alert("문제를 해결하는 중 오류가 발생했습니다.");
-    // } finally {
-    //   setIsLoading(false);
-    // }
+    try {
+      const response = await axios.post("http://localhost:8000/solve-problem", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      navigate('/explain', { state: { result: response.data } });
+    } catch (error) {
+      console.error("Error solving problem:", error);
+      alert("문제를 해결하는 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

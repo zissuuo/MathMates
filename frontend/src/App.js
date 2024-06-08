@@ -5,6 +5,7 @@ import styled from 'styled-components';
 
 import InitialPage from './components/page/InitialPage';
 import ExplainPage from './components/page/ExplainPage';
+import RecommendPage from './components/page/RecommendPage';
 
 const AllGlobalStyle = createGlobalStyle`
   @font-face {
@@ -50,6 +51,7 @@ function App() {
         <Routes>
           <Route path="/" element={<InitialPage />} />
           <Route path="/explain" element={<ExplainPage />} />
+          <Route path="/recommend" element={<RecommendPage/>} />
         </Routes>
       </AppContainer>
     </Router>

@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import axios from 'axios';
 
 const Container = styled.div`
   height: 100vh;
@@ -10,6 +11,13 @@ const Container = styled.div`
   flex-direction: column;
   z-index: 1;
   box-sizing: border-box;
+`;
+
+const TitleContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
 `;
 
 const Circle = styled.div`
@@ -38,13 +46,6 @@ const Title = styled.div`
   font-size: 30px;
   color: #252a2f;
   text-align: left;
-`;
-
-const TitleContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  flex-direction: column;
 `;
 
 const ResultContainer = styled.div`
@@ -80,28 +81,25 @@ const Text = styled.div`
   color: #252a2f;
 `;
 
-const SubmitButton = styled.button`
-  width: 60%;
-  height: 30px;
-  margin-top: 20px;
-  border-radius: 30px;
-  border: none;
-  box-shadow: inset 0px 0px 1px rgba(0, 0, 0, 0.1);
-  background-color: #d78a81;
-  color: #f8f7f3;
-  font-family: 'Pretendard-ExtraBold';
-  font-size: 15px;
-  cursor: pointer;
-`;
-
-const ExplainPage = () => {
+const RecommendPage = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { result } = location.state || {};
+  const { problem } = location.state || {};
+  const [similarProblems, setSimilarProblems] = useState([]);
 
-  const handleSimilarProblems = () => {
-    navigate('/recommend', { state: { problem: result.problem } });
-  };
+  useEffect(() => {
+    const fetchSimilarProblems = async () => {
+      try {
+        const response = await axios.post('http://localhost:8000/similar_problems', { problem });
+        setSimilarProblems(response.data);
+      } catch (error) {
+        console.error('Error fetching similar problems:', error);
+      }
+    };
+
+    if (problem) {
+      fetchSimilarProblems();
+    }
+  }, [problem]);
 
   return (
     <Container>
@@ -110,22 +108,21 @@ const ExplainPage = () => {
         <Title>MATHMATES</Title>
       </TitleContainer>
       <Circle />
-      {result ? (
+      {similarProblems.length > 0 ? (
         <ResultContainer>
-          <MainText>💡 해설이 도착했어요!</MainText>
-          <Subtitle>문제</Subtitle>
-          <Text>{result.problem}</Text>
-          <Subtitle>해설</Subtitle>
-          <Text>{result.explanation}</Text>
-          <Subtitle>정답</Subtitle>
-          <Text>{result.answer}</Text>
+          <MainText>비슷한 문제들</MainText>
+          {similarProblems.map((item, index) => (
+            <div key={index}>
+              <Subtitle>난이도: {item.difficulty}</Subtitle>
+              <Text>문제: {item.question}</Text>
+            </div>
+          ))}
         </ResultContainer>
       ) : (
-        <ResultContainer>결과를 로드하는 중 오류가 발생했습니다.</ResultContainer>
+        <ResultContainer>추천된 문제가 없습니다.</ResultContainer>
       )}
-      <SubmitButton onClick={handleSimilarProblems}>비슷한 문제 더 풀어보기</SubmitButton>
     </Container>
   );
 };
 
-export default ExplainPage;
+export default RecommendPage;
