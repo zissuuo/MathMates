@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 const Container = styled.div`
   height: 100vh;
@@ -97,10 +98,18 @@ const SubmitButton = styled.button`
 const ExplainPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { result } = location.state || {};
+  const { result, chapter } = location.state || {};
 
-  const handleSimilarProblems = () => {
-    navigate('/recommend', { state: { problem: result.problem } });
+  const handleSimilarProblems = async () => {
+    try {
+      const response = await axios.post('http://localhost:8000/similar_problems', {
+        chapter,
+        problem: result.problem,
+      });
+      navigate('/recommend', { state: { similarProblems: response.data, problem: result.problem, chapter } });
+    } catch (error) {
+      console.error('Error fetching similar problems:', error);
+    }
   };
 
   return (

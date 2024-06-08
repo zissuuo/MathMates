@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLocation } from "react-router-dom";
-import axios from 'axios';
 
 const Container = styled.div`
   height: 100vh;
@@ -92,23 +91,7 @@ const NumToText = (difficulty) => {
 
 const RecommendPage = () => {
   const location = useLocation();
-  const { problem } = location.state || {};
-  const [similarProblems, setSimilarProblems] = useState([]);
-
-  useEffect(() => {
-    const fetchSimilarProblems = async () => {
-      try {
-        const response = await axios.post('http://localhost:8000/similar_problems', { problem });
-        setSimilarProblems(response.data);
-      } catch (error) {
-        console.error('Error fetching similar problems:', error);
-      }
-    };
-
-    if (problem) {
-      fetchSimilarProblems();
-    }
-  }, [problem]);
+  const { similarProblems } = location.state || {};
 
   return (
     <Container>
@@ -117,7 +100,7 @@ const RecommendPage = () => {
         <Title>MATHMATES</Title>
       </TitleContainer>
       <Circle />
-      {similarProblems.length > 0 ? (
+      {similarProblems && similarProblems.length > 0 ? (
         <ResultContainer>
           <MainText>아래 문제를 더 풀어보세요 🧮</MainText>
           {similarProblems.map((item, index) => (

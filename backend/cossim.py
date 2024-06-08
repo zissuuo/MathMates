@@ -4,6 +4,7 @@ from gensim.models import Word2Vec
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
+# 데이터 로드
 df = pd.read_csv('/Users/kimjisu/Desktop/edu_project/item_pool.csv')
 questions = df['question'].tolist()
 
@@ -11,8 +12,9 @@ questions = df['question'].tolist()
 sentences = [question.split() for question in questions]
 model = Word2Vec(sentences, vector_size=100, window=5, min_count=1, workers=4)
 
-class Problem(BaseModel):
+class ProblemRequest(BaseModel):
     problem: str
+    chapter: str
 
 def get_sentence_vector(sentence, model):
     words = sentence.split()
@@ -21,18 +23,24 @@ def get_sentence_vector(sentence, model):
         return np.zeros(model.vector_size)
     return np.mean(word_vectors, axis=0)
 
-def find_similar_problems_logic(problem: Problem):
-    # input question을 벡터로 변환
+def find_similar_problems_logic(problem: ProblemRequest):
+    # 챕터로 DataFrame 필터링
+    chapter_filtered_df = df[df['chapter'] == problem.chapter]
+
+    if chapter_filtered_df.empty:
+        return []
+
+    # 입력된 문제를 벡터로 변환
     question_vector = get_sentence_vector(problem.problem, model).reshape(1, -1)
 
-    # 데이터프레임의 질문들을 벡터로 변환
-    df['vector'] = df['question'].apply(lambda x: get_sentence_vector(x, model))
+    # DataFrame의 질문들을 벡터로 변환
+    chapter_filtered_df['vector'] = chapter_filtered_df['question'].apply(lambda x: get_sentence_vector(x, model))
 
     # 코사인 유사도 계산
-    df['cosine_sim'] = df['vector'].apply(lambda x: cosine_similarity([x], question_vector).flatten()[0])
+    chapter_filtered_df['cosine_sim'] = chapter_filtered_df['vector'].apply(lambda x: cosine_similarity([x], question_vector).flatten()[0])
 
-    # 유사도 기준으로 데이터프레임 정렬
-    df_sorted = df.sort_values(by='cosine_sim', ascending=False)
+    # 코사인 유사도 기준으로 DataFrame 정렬
+    df_sorted = chapter_filtered_df.sort_values(by='cosine_sim', ascending=False)
 
     # 난이도별로 유사도가 가장 높은 질문 선택
     top_questions_by_difficulty = df_sorted.groupby('difficulty').first().reset_index()

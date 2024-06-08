@@ -130,15 +130,20 @@ const Dot = styled.span`
 const InitialPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedOption, setSelectedOption] = useState('');
+  const [selectedGrade, setSelectedGrade] = useState('');
+  const [selectedChapter, setSelectedChapter] = useState('');
   const navigate = useNavigate();
 
   const handleFileSelect = (file) => {
     setSelectedFile(file);
   };
 
-  const handleOptionSelect = (option) => {
-    setSelectedOption(option);
+  const handleGradeSelect = (option) => {
+    setSelectedGrade(option);
+  };
+
+  const handleChapterSelect = (option) => {
+    setSelectedChapter(option);
   };
 
   const handleSubmit = async () => {
@@ -158,7 +163,7 @@ const InitialPage = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      navigate('/explain', { state: { result: response.data } });
+      navigate('/explain', { state: { result: response.data, grade: selectedGrade, chapter: selectedChapter } });
     } catch (error) {
       console.error("Error solving problem:", error);
       alert("문제를 해결하는 중 오류가 발생했습니다.");
@@ -178,8 +183,8 @@ const InitialPage = () => {
       </TitleContainer>
       <Circle />
       <DropdownContainer>
-        <Dropdown options={options1} onSelect={handleOptionSelect} label="학년" />
-        <Dropdown options={options2} onSelect={handleOptionSelect} label="단원" />  
+        <Dropdown options={options1} onSelect={handleGradeSelect} label="학년" />
+        <Dropdown options={options2} onSelect={handleChapterSelect} label="단원" />  
       </DropdownContainer>
       <UploadContainer>
         <ImgUpload onFileSelect={handleFileSelect} />
