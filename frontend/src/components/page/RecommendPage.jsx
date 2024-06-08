@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useLocation } from "react-router-dom";
 
@@ -10,6 +10,7 @@ const Container = styled.div`
   flex-direction: column;
   z-index: 1;
   box-sizing: border-box;
+  padding-bottom: 30px;
 `;
 
 const TitleContainer = styled.div`
@@ -50,27 +51,28 @@ const Title = styled.div`
 const ResultContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 20px;
   background-color: white;
   border-radius: 30px;
   width: 80%;
   height: auto;
+  min-height: 250px;  /* 필요에 따라 이 값을 조정하거나 제거하세요 */
   box-sizing: border-box;
   padding: 30px;
   z-index: 1;
   box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.1);
+  overflow: auto;  /* 추가된 스타일 */
 `;
 
 const MainText = styled.div`
   font-family: "Pretendard-ExtraBold";
   font-size: 20px;
   color: #252a2f;
-  margin-bottom: 20px;
 `;
 
 const Subtitle = styled.div`
   font-family: "Pretendard-Bold";
-  font-size: 17px;
+  font-size: 15px;
+  text-align: center;
   color: #252a2f;
 `;
 
@@ -78,6 +80,48 @@ const Text = styled.div`
   font-family: "Pretendard-Medium";
   font-size: 12px;
   color: #252a2f;
+`;
+
+const ButtonContainer = styled.div`
+  margin: 30px 0;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+`;
+
+const Button = styled.button`
+  font-family: "Pretendard-Medium";
+  font-size: 14px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #d78a81;
+  color: white;
+
+  &:hover {
+    background-color: #eb5444;
+  }
+`;
+
+const Divider = styled.hr`
+  border: none;
+  height: 1px;
+  background-color: #d4d4d4;
+  margin-bottom: 30px;
+  width: 100%;
+`;
+
+const ProblemContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const Problem = styled.div`
+  font-family: "Pretendard-SemiBold";
+  font-size: 14px;
+  
 `;
 
 const NumToText = (difficulty) => {
@@ -92,6 +136,20 @@ const NumToText = (difficulty) => {
 const RecommendPage = () => {
   const location = useLocation();
   const { similarProblems } = location.state || {};
+  const [filteredDifficulty, setFilteredDifficulty] = useState(null);
+  const [showAnswer, setShowAnswer] = useState({});
+
+  const filterProblems = (difficulty) => {
+    setFilteredDifficulty(difficulty);
+  };
+
+  const toggleAnswer = (index) => {
+    setShowAnswer((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
+
+  const filteredProblems = similarProblems
+    ? similarProblems.filter(problem => filteredDifficulty === null || problem.difficulty === filteredDifficulty)
+    : [];
 
   return (
     <Container>
@@ -100,20 +158,40 @@ const RecommendPage = () => {
         <Title>MATHMATES</Title>
       </TitleContainer>
       <Circle />
-      {similarProblems && similarProblems.length > 0 ? (
-        <ResultContainer>
-          <MainText>아래 문제를 더 풀어보세요 🧮</MainText>
-          {similarProblems.map((item, index) => (
-            <div key={index}>
+      <ResultContainer>
+        <MainText>난이도를 클릭하여</MainText>
+        <MainText>유사한 문제를 더 풀어보세요 🧮</MainText>
+        <ButtonContainer>
+          <Button onClick={() => filterProblems(0)}>상</Button>
+          <Button onClick={() => filterProblems(1)}>중</Button>
+          <Button onClick={() => filterProblems(2)}>하</Button>
+        </ButtonContainer>
+        {filteredDifficulty !== null && <Divider />}
+        {filteredDifficulty !== null && filteredProblems.length > 0 ? (
+          filteredProblems.map((item, index) => (
+            <ProblemContainer key={index}>
               <Subtitle>난이도 {NumToText(item.difficulty)}</Subtitle>
-              <Text>{item.chapter}</Text>
-              <Text>{item.question}</Text>
-            </div>
-          ))}
-        </ResultContainer>
-      ) : (
-        <ResultContainer>추천된 문제가 없습니다.</ResultContainer>
-      )}
+              <Problem>{item.question}</Problem>
+              {item.s1 && <Text>① {item.s1}</Text>}
+              {item.s2 && <Text>② {item.s2}</Text>}
+              {item.s3 && <Text>③ {item.s3}</Text>}
+              {item.s4 && <Text>④ {item.s4}</Text>}
+              {item.s5 && <Text>⑤ {item.s5}</Text>}
+              <Button onClick={() => toggleAnswer(index)}>
+                {showAnswer[index] ? '숨기기' : '정답 확인'}
+              </Button>
+              {showAnswer[index] && (
+                <>
+                  <Text>정답: {item.answer}</Text>
+                  <Text>해설: {item.explanation}</Text>
+                </>
+              )}
+            </ProblemContainer>
+          ))
+        ) : (
+          filteredDifficulty !== null && <Text>추천된 문제가 없습니다.</Text>
+        )}
+      </ResultContainer>
     </Container>
   );
 };
