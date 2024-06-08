@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
 # 데이터 로드
-df = pd.read_csv('/Users/kimjisu/Desktop/edu_project/item_pool.csv')
+df = pd.read_csv('/Users/kimjisu/Desktop/edu_project/dataset/item_pool.csv')
 questions = df['question'].tolist()
 
 # Word2Vec 모델 학습
